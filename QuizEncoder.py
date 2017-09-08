@@ -1,4 +1,5 @@
 from json import JSONEncoder
+from QuestionEncoder import QuestionEncoder
 
 
 class QuizEncoder(JSONEncoder):

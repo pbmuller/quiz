@@ -43,7 +43,7 @@ class Quiz(object):
                     self._populate_quiz()
                     # save the quiz to the quizzes directory as a new file
                     quiz_file = open('{}.txt'.format(self.quiz_title), 'w')
-                    quiz_file.write(json.dumps(self), encoder=QuizEncoder())
+                    quiz_file.write(json.dumps(self, encoder=QuizEncoder()))
                     # ask if the user would like to take the quiz now
                     if input('Would you like to take the quiz now? [Y/n]').lower() != 'n':
                         self.quiz()
@@ -53,9 +53,8 @@ class Quiz(object):
                     valid_index = False
                     quiz_dict = {}
                     # print the list of files in the quizzes directory
-                    quiz_enum = enumerate(os.listdir(Resources.quizzes_file_path), start=1)
                     print('Quiz List')
-                    for num, file in quiz_enum:
+                    for num, file in enumerate(os.listdir(os.path.dirname(__file__) + '/quizzes'), start=1):
                         print('{}: {}'.format(num, file))
                         quiz_dict[num] = file
                     # ask the user which of the quizzes they would like to take.

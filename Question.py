@@ -6,6 +6,12 @@ class Question(object):
         self.question = question
         self.answer = answer
 
+    def __eq__(self, other):
+        return self.question == other.question and self.answer == other.answer
+
+    def __ne__(self, other):
+        return self.question != other.question or self.answer != other.answer
+
     def ask(self, how_to_ask='FTIB', *args):
         if how_to_ask == 'MC':
             answer_set = set(args)
@@ -40,3 +46,7 @@ class Question(object):
     def wrong_answer():
         print('Sorry, that was not correct')
         return False
+
+    @classmethod
+    def from_strings(cls, question, answer):
+        return cls(question, answer)
