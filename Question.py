@@ -1,7 +1,7 @@
 import random
 
 
-class Question(object):
+class Question:
     def __init__(self, question, answer):
         self.question = question
         self.answer = answer
@@ -12,11 +12,12 @@ class Question(object):
     def __ne__(self, other):
         return self.question != other.question or self.answer != other.answer
 
-    def ask(self, how_to_ask='FTIB', *args):
+    def ask(self, how_to_ask, *args):
         if how_to_ask == 'MC':
             answer_set = set(args)
             answer_set.add(self.answer)
             answer_set = random.sample(answer_set, len(answer_set))
+            correct = None
             for num, answer in enumerate(answer_set, start=1):
                 print('{}. {}'.format(num, answer))
                 if answer == self.answer:

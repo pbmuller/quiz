@@ -1,14 +1,12 @@
 from Question import Question
-from QuizEncoder import QuizEncoder
-import json
+import pickle
 import os
 import Resources
 import random
 
 
-class Quiz(object):
-    def __init__(self, questions=set(), score=0, quiz_title="New Quiz"):
-        super().__init__()
+class Quiz:
+    def __init__(self, questions=list(), score=0, quiz_title="New Quiz"):
         self.questions = questions
         self.score = score
         self.quiz_title = quiz_title
@@ -17,7 +15,7 @@ class Quiz(object):
         while input('Would you like to add another question? [Y/n] ').lower() != 'n':
             question_text = input('What is the question?\n')
             answer = input('What is the correct answer?\n')
-            self.questions.add(Question(question_text, answer))
+            self.questions.append(Question(question_text, answer))
 
     def quiz(self):
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -25,7 +23,7 @@ class Quiz(object):
         for num, question in enumerate(self.questions):
             print('Question {}'.format(num))
             wrong_answers = self.get_wrong_answers(question)
-            if question.ask(wrong_answers, how_to_ask='MC'):
+            if question.ask('FITB', wrong_answers):
                 self.score += 1
         print('You scored {}/{}'.format(self.score, len(self.questions)))
 
@@ -42,8 +40,12 @@ class Quiz(object):
                     # populate the quiz
                     self._populate_quiz()
                     # save the quiz to the quizzes directory as a new file
-                    quiz_file = open('{}.txt'.format(self.quiz_title), 'w')
-                    quiz_file.write(json.dumps(self, encoder=QuizEncoder()))
+                    quiz_file = open('{}{}{}.pickle'.format(
+                        Resources.quizzes_file_path,
+                        '\\' if os.name == 'nt' else '/',
+                        self.quiz_title), 'wb')
+                    pickle.dump(self, quiz_file)
+                    quiz_file.close()
                     # ask if the user would like to take the quiz now
                     if input('Would you like to take the quiz now? [Y/n]').lower() != 'n':
                         self.quiz()
@@ -54,7 +56,9 @@ class Quiz(object):
                     quiz_dict = {}
                     # print the list of files in the quizzes directory
                     print('Quiz List')
-                    for num, file in enumerate(os.listdir(os.path.dirname(__file__) + '/quizzes'), start=1):
+                    for num, file in enumerate(
+                            os.listdir(Resources.quizzes_file_path),
+                            start=1):
                         print('{}: {}'.format(num, file))
                         quiz_dict[num] = file
                     # ask the user which of the quizzes they would like to take.
@@ -64,15 +68,21 @@ class Quiz(object):
                         except ValueError:
                             print('Sorry, that wasn\'t a valid index')
                         else:
+                            quiz_file = open('{}{}{}'.format(
+                                Resources.quizzes_file_path,
+                                '\\' if os.name == 'nt' else '/',
+                                quiz_dict[quiz_index], 'rb'))
                             # load that quiz from the json in the file
-                            json_quiz = json.load(Resources.quizzes_file_path + ' \\' + quiz_dict[quiz_index])
-                            selected_quiz = self.dict_to_quiz(
-                                json_quiz['questions'],
-                                json_quiz['score'],
-                                json_quiz['quiz_title']
-                            )
+                            pickle_quiz = pickle.load(quiz_file)
+                            quiz_file.close()
+                            # selected_quiz = self.dict_to_quiz(
+                            #     pickle_quiz['questions'],
+                            #     pickle_quiz['score'],
+                            #     pickle_quiz['quiz_title']
+                            # )
+
                             # give the user the quiz
-                            selected_quiz.quiz()
+                            pickle_quiz.quiz()
 
     def get_wrong_answers(self, current_question):
         while True:
