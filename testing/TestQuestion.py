@@ -1,31 +1,30 @@
 import unittest
-import json
-import os
+import pickle
+import Resources
 from Question import Question
-from QuestionEncoder import QuestionEncoder
 
 
 class TestQuiz(unittest.TestCase):
     def setUp(self):
         self.question = Question("What day is today?", "Today")
-        self.test_file = open(os.path.dirname(__file__) + '/test.json', 'w+')
 
-    def tearDown(self):
-        self.test_file.close()
-
-    def test_JSON_serializable(self):
+    def test_pickling(self):
         self.setUp()
         try:
-            json.dumps(self.question, cls=QuestionEncoder)
+            pickle_in = open('test_pickling.pickle', 'wb')
+            pickle.dump(self.question, pickle_in)
+            pickle_in.close()
             self.assertEqual(1, 1)
         except TypeError:
             self.assertEqual(1, 2)
 
     def test_from_JSON(self):
         self.setUp()
-        json.dump(self.question, self.test_file, cls=QuestionEncoder)
-        q = json.load(self.test_file)
-        q = Question.from_strings(q['question'], q['answer'])
+        pickle_in = open('test_pickling.pickle', 'wb')
+        pickle.dump(self.question, pickle_in)
+        pickle_in.close()
+        pickle_out = open('test_pickling.pickle', 'rb')
+        q = pickle.load(pickle_out)
         self.assertEqual(self.question, q)
 
 if __name__ == '__main__':
