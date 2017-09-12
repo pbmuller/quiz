@@ -1,53 +1,1 @@
-import random
-
-
-class Question:
-    def __init__(self, question, answer):
-        self.question = question
-        self.answer = answer
-
-    def __eq__(self, other):
-        return self.question == other.question and self.answer == other.answer
-
-    def __ne__(self, other):
-        return self.question != other.question or self.answer != other.answer
-
-    def ask(self, how_to_ask, *args):
-        if how_to_ask == 'MC':
-            answer_set = set(args)
-            answer_set.add(self.answer)
-            answer_set = random.sample(answer_set, len(answer_set))
-            correct = None
-            for num, answer in enumerate(answer_set, start=1):
-                print('{}. {}'.format(num, answer))
-                if answer == self.answer:
-                    correct = num
-            while True:
-                try:
-                    if int(input('Enter the number corresponding to the correct answer')) == correct:
-                        return self.correct_answer()
-                    else:
-                        return self.wrong_answer()
-                except ValueError:
-                    print('Sorry that wasn\'t a valid number')
-        elif how_to_ask == 'FITB':
-            answer = input(self.question + '\n').lower()
-            if answer == self.answer:
-                print('CORRECT!')
-                return True
-            else:
-                print('Sorry, that was not correct')
-
-    @staticmethod
-    def correct_answer():
-        print('CORRECT')
-        return True
-
-    @staticmethod
-    def wrong_answer():
-        print('Sorry, that was not correct')
-        return False
-
-    @classmethod
-    def from_strings(cls, question, answer):
-        return cls(question, answer)
+import randomclass Question:    TF = 'TF'    FITB = 'FITB'    MC = 'MC'    def __init__(self, question, answer, how_to_ask, wrong_answers=[]):        self.question = question        self.how_to_ask = how_to_ask.upper()        self.answer = answer        self.wrong_answers = wrong_answers        # Check conditions on all of the attributes that we just made        if self.answer == '':            raise ValueError('Answer cannot be an empty string')        if self.how_to_ask == Question.TF:            if self.answer.lower() != 'true' and self.answer.lower() != 'false':                raise ValueError('True/False Questions must be have either true or false as their answer')        elif self.how_to_ask == Question.MC:            if len(self.wrong_answers) < 2:                raise ValueError('Multiple choice questions must have at least two wrong answers')        elif self.how_to_ask != Question.FITB:            raise ValueError('Sorry, I don\'t know how to ask this type of question {}'.format(self.how_to_ask))    def ask(self):        if self.how_to_ask == Question.MC:            return self.ask_multiple_choice()        elif self.how_to_ask == Question.FITB:            return self.ask_fill_in_the_blank()        elif self.how_to_ask == Question.TF:            return self.ask_true_or_false()        else:            raise TypeError("Sorry, I don't know how to ask this question")    def ask_multiple_choice(self):        print('Mulitple Choice:\n{}'.format(self.question))        answer_set = set(self.wrong_answers)        answer_set.add(self.answer)        answer_set = random.sample(answer_set, len(answer_set))        correct = None        for num, answer in enumerate(answer_set, start=1):            print('{}. {}'.format(num, answer))            if answer == self.answer:                correct = num        try:            if int(input('Enter the number corresponding to the correct answer\n>')) == correct:                return self.correct_answer()            else:                return self.wrong_answer()        except ValueError:            print('Sorry that wasn\'t a valid number')            return self.wrong_answer()    def ask_fill_in_the_blank(self):        print('Fill in the blank')        return self.word_response()    def word_response(self):        answer = input(self.question + '\n>').lower()        if answer == self.answer.lower():            return self.correct_answer()        else:            return self.wrong_answer()    def ask_true_or_false(self):        print("Enter True or False")        return self.word_response()    @staticmethod    def correct_answer():        print('CORRECT')        return True    def wrong_answer(self):        print('Sorry, that was not correct')        print('The correct answer was {}'.format(self.answer))        return False
