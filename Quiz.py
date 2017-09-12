@@ -68,7 +68,7 @@ class Quiz:
                     # save the quiz to the quizzes directory as a new file
                     quiz_file = open('{}{}{}.pickle'.format(
                         Resources.quizzes_file_path,
-                        '\\' if os.name == 'nt' else '/',
+                        Resources.proper_slash(),
                         self.quiz_title), 'wb')
                     pickle.dump(self, quiz_file)
                     quiz_file.close()
@@ -95,7 +95,7 @@ class Quiz:
                         else:
                             quiz_file = open('{}{}{}'.format(
                                 Resources.quizzes_file_path,
-                                '\\' if os.name == 'nt' else '/',
+                                Resources.proper_slash(),
                                 quiz_dict[quiz_index]), 'rb')
                             # load that quiz from the pickle in the file
                             pickle_quiz = pickle.load(quiz_file)
